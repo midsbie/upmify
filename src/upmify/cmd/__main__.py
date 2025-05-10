@@ -46,8 +46,8 @@ def rebuild_asset_structure(temp_dir: Path, runtime_dir: Path) -> None:
     for sub in temp_dir.iterdir():
         pathname = sub / "pathname"
         if not pathname.is_file():
-            log.debug("Skipping junk folder: %s", sub)
-            continue  # skip junk folders
+            log.debug("Skipping junk item: %s", sub)
+            continue
 
         with pathname.open("rb") as f:
             raw = f.read()
