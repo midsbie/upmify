@@ -29,7 +29,8 @@ def validate_assembly_name(name: str) -> str:
     for part in parts:
         if not identifier_re.match(part):
             raise argparse.ArgumentTypeError(
-                f"Invalid assembly name: '{name}'. Each part must be a valid C# identifier "
+                f"Invalid assembly name: '{name}'. "
+                "Each part must be a valid C# identifier "
                 f"(got invalid segment: '{part}')"
             )
     return name
@@ -61,12 +62,25 @@ def main():
         "--git-init",
         "-g",
         action="store_true",
-        help="Initialise a git repository in the generated package and commit the result",
+        help=(
+            "Initialise a git repository in the generated package and commit the result"
+        ),
     )
     p.add_argument(
         "--lfs",
         action="store_true",
         help="After --git-init, copy .gitattributes and run 'git lfs install --local'",
+    )
+
+    p.add_argument(
+        "--package-version",
+        default="1.0.0",
+        help="Version of the package (default: 1.0.0)",
+    )
+    p.add_argument(
+        "--unity-version",
+        default="2021.3",
+        help="Minimum required Unity version (default: 2021.3)",
     )
 
     p.add_argument(
@@ -105,6 +119,8 @@ def main():
         git_init=args.git_init,
         use_lfs=args.lfs,
         force=args.force,
+        package_version=args.package_version,
+        unity_version=args.unity_version,
     )
 
 

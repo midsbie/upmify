@@ -30,6 +30,8 @@ def convert(
     git_init: bool = False,
     use_lfs: bool = False,
     force: bool = False,
+    package_version: str = "1.0.0",
+    unity_version: str = "2021.3",
 ) -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -58,7 +60,14 @@ def convert(
         dependencies = rebuild_asset_structure(tmp_path, runtime_dir)
 
     log.info("Writing package.json and asmdef...")
-    write_package_json(pkg_dir, package_name, display_name, dependencies=dependencies)
+    write_package_json(
+        pkg_dir,
+        package_name,
+        display_name,
+        dependencies=dependencies,
+        package_version=package_version,
+        unity_version=unity_version,
+    )
     write_asmdef(runtime_dir, assembly_name)
 
     if git_init:

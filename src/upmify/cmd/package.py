@@ -13,14 +13,14 @@ def write_package_json(
     name: str,
     display: str,
     dependencies: dict[str, str] = None,
-    version="1.0.0",
-    unity="2021.3",
+    package_version="1.0.0",
+    unity_version="2021.3",
 ) -> None:
     pkg_def = {
         "name": name,
         "displayName": display,
-        "version": version,
-        "unity": unity,
+        "version": package_version,
+        "unity": unity_version,
         "description": f"Wrapped version of {display}",
         "author": {"name": "AutoWrapped", "email": "noreply@example.com"},
     }
