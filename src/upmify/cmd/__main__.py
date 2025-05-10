@@ -5,9 +5,32 @@ Convert a .unitypackage to a UPM-style package.
 Usage:
     python -m upmify.cmd \
         MyAsset.unitypackage \
-        ./out \
-        com.mycompany.myasset \
-        "My Asset"
+        --output-dir ./out \
+        --package-name com.mycompany.myasset \
+        --display-name "My Asset" \
+        --assembly-name MyCompany.MyAsset \
+        [--package-version 1.0.0] \
+        [--unity-version 2021.3] \
+        [--git-init] \
+        [--lfs] \
+        [--force] \
+        [--verbose | --quiet]
+
+Arguments:
+    unitypackage            Path to the .unitypackage file to convert
+
+Options:
+    -o, --output-dir        Destination directory for the generated UPM package
+    -p, --package-name      UPM-style package name (e.g., com.mycompany.myasset)
+    -d, --display-name      Human-readable name for the package
+    -a, --assembly-name     C# assembly name for the .asmdef file
+    --package-version       Version string for the UPM package (default: 1.0.0)
+    --unity-version         Minimum required Unity version (default: 2021.3)
+    -g, --git-init          Initialize a git repository in the package
+    --lfs                   Enable Git LFS support if --git-init is used
+    -f, --force             Overwrite output directory if it exists
+    -v, --verbose           Enable detailed logging
+    -q, --quiet             Suppress most output
 """
 
 from __future__ import annotations
