@@ -32,11 +32,23 @@ python -m upmify.cmd \
   "My Asset Display Name"
 ```
 
-### Optional Flags (coming soon)
+### Supported Flags
 
-* `--remote <git-url>`: Automatically adds a Git remote and pushes initial tag
+* `-g`, `--git-init`
+  Initialize a Git repository in the generated package directory and create an initial commit.
 
----
+* `--lfs`
+  After `--git-init`, enable Git LFS by adding a `.gitattributes` file and running `git lfs install --local`.
+
+* `-f`, `--force`
+  Overwrite the output package directory if it already exists.
+
+* `-v`, `--verbose`
+  Enable detailed logging output (debug-level messages).
+
+* `-q`, `--quiet`
+  Suppress most logging output (warnings and errors only).
+
 
 ## Example Use
 
