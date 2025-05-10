@@ -9,12 +9,15 @@ Usage:
         com.mycompany.myasset \
         "My Asset"
 """
+
 from __future__ import annotations
 
 import argparse
 import json
 import logging
 import shutil
+import stat
+import subprocess
 import tarfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -43,28 +46,27 @@ def rebuild_asset_structure(temp_dir: Path, runtime_dir: Path) -> None:
         pathname = sub / "pathname"
         if not pathname.is_file():
             log.debug("Skipping junk folder: %s", sub)
-            continue                     # skip junk folders
+            continue  # skip junk folders
 
         with pathname.open("rb") as f:
             raw = f.read()
 
         # Split at the first newline or NUL and decode just that part
-        relative = raw.split(b'\n', 1)[0].split(b'\x00', 1)[0].decode("utf-8", "ignore")
-
+        relative = raw.split(b"\n", 1)[0].split(b"\x00", 1)[0].decode("utf-8", "ignore")
 
         dest_path = runtime_dir / relative
         dest_path.parent.mkdir(parents=True, exist_ok=True)
 
         asset_file = sub / "asset"
-        meta_file  = sub / "asset.meta"
+        meta_file = sub / "asset.meta"
 
-        if asset_file.is_file():         # regular asset
+        if asset_file.is_file():  # regular asset
             log.debug("Copying asset: %s -> %s", asset_file, dest_path)
             shutil.copy2(asset_file, dest_path)
-        elif meta_file.is_file():        # folder asset
+        elif meta_file.is_file():  # folder asset
             log.debug("Creating folder: %s", dest_path)
             dest_path.mkdir(exist_ok=True)
-        else:                            # nothing useful
+        else:  # nothing useful
             log.debug("Skipping empty entry: %s", sub)
             continue
 
@@ -76,15 +78,16 @@ def rebuild_asset_structure(temp_dir: Path, runtime_dir: Path) -> None:
         shutil.copy2(meta_file, dest_path.with_suffix(dest_path.suffix + ".meta"))
 
 
-def write_package_json(pkg_dir: Path, name: str, display: str, version="1.0.0",
-                       unity="2021.3") -> None:
+def write_package_json(
+    pkg_dir: Path, name: str, display: str, version="1.0.0", unity="2021.3"
+) -> None:
     pkg_def = {
         "name": name,
         "displayName": display,
         "version": version,
         "unity": unity,
         "description": f"Wrapped version of {display}",
-        "author": {"name": "AutoWrapped", "email": "noreply@example.com"}
+        "author": {"name": "AutoWrapped", "email": "noreply@example.com"},
     }
     (pkg_dir / "package.json").write_text(json.dumps(pkg_def, indent=4))
 
@@ -94,17 +97,15 @@ def write_asmdef(runtime_dir: Path, name: str) -> None:
         "name": name,
         "references": [],
         "autoReferenced": True,
-        "noEngineReferences": False
+        "noEngineReferences": False,
     }
     (runtime_dir / f"{name}.asmdef").write_text(json.dumps(asm, indent=4))
 
 
-def convert(unitypackage: Path, output_dir: Path,
-            package_name: str, display_name: str) -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(levelname)s: %(message)s"
-    )
+def convert(
+    unitypackage: Path, output_dir: Path, package_name: str, display_name: str
+) -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     pkg_dir = output_dir / package_name
     runtime_dir = pkg_dir / "Runtime"
@@ -127,15 +128,20 @@ def convert(unitypackage: Path, output_dir: Path,
 
 def main():
     p = argparse.ArgumentParser(
-        description="Wrap a .unitypackage as a Unity UPM package")
+        description="Wrap a .unitypackage as a Unity UPM package"
+    )
     p.add_argument("unitypackage", type=Path, help="Path to the .unitypackage")
     p.add_argument("output_dir", type=Path, help="Destination directory")
     p.add_argument("package_name", help="UPM name, e.g. com.myco.asset")
     p.add_argument("display_name", help="Human-readable display name")
 
     verbosity = p.add_mutually_exclusive_group()
-    verbosity.add_argument("--verbose", "-v", action="store_true", help="Enable detailed logging")
-    verbosity.add_argument("--quiet", "-q", action="store_true", help="Suppress most output")
+    verbosity.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable detailed logging"
+    )
+    verbosity.add_argument(
+        "--quiet", "-q", action="store_true", help="Suppress most output"
+    )
 
     args = p.parse_args()
 
@@ -149,8 +155,7 @@ def main():
 
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 
-    convert(args.unitypackage, args.output_dir,
-            args.package_name, args.display_name)
+    convert(args.unitypackage, args.output_dir, args.package_name, args.display_name)
 
 
 if __name__ == "__main__":
