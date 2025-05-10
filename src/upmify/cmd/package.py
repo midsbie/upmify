@@ -9,7 +9,12 @@ log = logging.getLogger(__name__)
 
 
 def write_package_json(
-    pkg_dir: Path, name: str, display: str, version="1.0.0", unity="2021.3"
+    pkg_dir: Path,
+    name: str,
+    display: str,
+    dependencies: dict[str, str] = None,
+    version="1.0.0",
+    unity="2021.3",
 ) -> None:
     pkg_def = {
         "name": name,
@@ -19,6 +24,10 @@ def write_package_json(
         "description": f"Wrapped version of {display}",
         "author": {"name": "AutoWrapped", "email": "noreply@example.com"},
     }
+
+    if dependencies:
+        pkg_def["dependencies"] = dependencies
+
     (pkg_dir / "package.json").write_text(json.dumps(pkg_def, indent=4))
 
 

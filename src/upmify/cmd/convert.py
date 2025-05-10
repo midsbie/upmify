@@ -49,15 +49,16 @@ def convert(
     runtime_dir.mkdir(parents=True, exist_ok=True)
 
     log.info("Extracting %s...", unitypackage)
+    dependencies = {}
     with TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         extract_unitypackage(unitypackage, tmp_path)
 
         log.info("Rebuilding asset tree...")
-        rebuild_asset_structure(tmp_path, runtime_dir)
+        dependencies = rebuild_asset_structure(tmp_path, runtime_dir)
 
     log.info("Writing package.json and asmdef...")
-    write_package_json(pkg_dir, package_name, display_name)
+    write_package_json(pkg_dir, package_name, display_name, dependencies=dependencies)
     write_asmdef(runtime_dir, assembly_name)
 
     if git_init:
