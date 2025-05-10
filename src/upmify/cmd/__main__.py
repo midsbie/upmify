@@ -16,6 +16,7 @@ import argparse
 import importlib.resources as pkg_resources
 import json
 import logging
+import re
 import shutil
 import stat
 import subprocess
@@ -152,6 +153,7 @@ def convert(
     output_dir: Path,
     package_name: str,
     display_name: str,
+    assembly_name: str,
     git_init: bool = False,
     use_lfs: bool = False,
     force: bool = False,
@@ -183,7 +185,7 @@ def convert(
 
     log.info("Writing package.json and asmdef...")
     write_package_json(pkg_dir, package_name, display_name)
-    write_asmdef(runtime_dir, display_name.replace(" ", ""))
+    write_asmdef(runtime_dir, assembly_name)
 
     if git_init:
         init_git_repo(pkg_dir, display_name, use_lfs=use_lfs)
@@ -191,14 +193,40 @@ def convert(
     log.info("Done. Package written to %s", pkg_dir)
 
 
+def validate_assembly_name(name: str) -> str:
+    identifier_re = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
+    parts = name.split(".")
+    for part in parts:
+        if not identifier_re.match(part):
+            raise argparse.ArgumentTypeError(
+                f"Invalid assembly name: '{name}'. Each part must be a valid C# identifier "
+                f"(got invalid segment: '{part}')"
+            )
+    return name
+
+
 def main():
     p = argparse.ArgumentParser(
         description="Wrap a .unitypackage as a Unity UPM package"
     )
     p.add_argument("unitypackage", type=Path, help="Path to the .unitypackage")
-    p.add_argument("output_dir", type=Path, help="Destination directory")
-    p.add_argument("package_name", help="UPM name, e.g. com.myco.asset")
-    p.add_argument("display_name", help="Human-readable display name")
+    p.add_argument(
+        "--output-dir", "-o", required=True, type=Path, help="Destination directory"
+    )
+    p.add_argument(
+        "--package-name", "-p", required=True, help="UPM name, e.g. com.myco.asset"
+    )
+    p.add_argument(
+        "--display-name", "-d", required=True, help="Human-readable display name"
+    )
+    p.add_argument(
+        "--assembly-name",
+        "-a",
+        type=validate_assembly_name,
+        required=True,
+        help="Name for the generated .asmdef file (must be a valid C# assembly name)",
+    )
+
     p.add_argument(
         "--git-init",
         "-g",
@@ -243,6 +271,7 @@ def main():
         args.output_dir,
         args.package_name,
         args.display_name,
+        args.assembly_name,
         git_init=args.git_init,
         use_lfs=args.lfs,
         force=args.force,
