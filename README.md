@@ -4,8 +4,6 @@
 
 It automatically extracts asset contents, rebuilds the internal folder structure, adds assembly definitions (`.asmdef`), generates a `package.json`, and optionally initializes a Git repository for version control and reuse across projects.
 
----
-
 ## Features
 
 - Extracts `.unitypackage` tarballs into clean folder structures
@@ -14,14 +12,13 @@ It automatically extracts asset contents, rebuilds the internal folder structure
 - Initializes a Git repository (optional)
 - Supports automation and CI workflows
 
----
-
 ## Installation
 
 ```bash
 git clone https://github.com/midsbie/upmify.git
 cd upmify
-````
+make setup
+```
 
 ## Usage
 
