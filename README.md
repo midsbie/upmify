@@ -54,6 +54,7 @@ python -m upmify.cmd \
 
 ```bash
 python -m upmify.cmd \
+  -g \
   "$HOME/.local/share/unity3d/Asset Store-5.x/Some Publisher/Tools/My Cool Asset.unitypackage" \
   ./WrappedPackages \
   com.author.coolasset \
@@ -69,7 +70,8 @@ WrappedPackages/
     ├── Runtime/
     │   └── ...extracted content...
     ├── Runtime/CoolAsset.asmdef
-    └── .git/  (optional Git repo initialized)
+    └── .git/
+    └── .gitignore
 ```
 
 Then add it to any Unity project via `manifest.json`:
