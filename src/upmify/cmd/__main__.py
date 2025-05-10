@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib.resources as pkg_resources
 import json
 import logging
 import shutil
@@ -102,8 +103,57 @@ def write_asmdef(runtime_dir: Path, name: str) -> None:
     (runtime_dir / f"{name}.asmdef").write_text(json.dumps(asm, indent=4))
 
 
+def _copy_template_file(package: str, resource_name: str, dest: Path) -> None:
+    try:
+        with pkg_resources.files(package).joinpath(resource_name).open("rb") as fsrc:
+            with dest.open("wb") as fdst:
+                shutil.copyfileobj(fsrc, fdst)
+    except FileNotFoundError:
+        log.warning("Template %s not found in package %s", resource_name, package)
+
+
+def init_git_repo(pkg_dir: Path, display_name: str, *, use_lfs: bool = False) -> None:
+    if (pkg_dir / ".git").is_dir():
+        log.debug("Git repo already present, skipping git init")
+        return
+
+    try:
+        subprocess.run(["git", "--version"], check=True, stdout=subprocess.DEVNULL)
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        log.warning("Git executable not found – skipping repository initialisation")
+        return
+
+    log.info("Initialising git repository…")
+    subprocess.run(["git", "init"], cwd=pkg_dir, check=True)
+
+    _copy_template_file("upmify.templates", ".gitignore", pkg_dir / ".gitignore")
+
+    if use_lfs:
+        _copy_template_file(
+            "upmify.templates", ".gitattributes", pkg_dir / ".gitattributes"
+        )
+        try:
+            subprocess.run(
+                ["git", "lfs", "install", "--local"], cwd=pkg_dir, check=True
+            )
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            log.warning("Git-LFS is not available – continuing without it")
+
+    subprocess.run(["git", "add", "-A"], cwd=pkg_dir, check=True)
+    subprocess.run(
+        ["git", "commit", "-m", f"Add initial UPM package for {display_name}"],
+        cwd=pkg_dir,
+        check=True,
+    )
+
+
 def convert(
-    unitypackage: Path, output_dir: Path, package_name: str, display_name: str
+    unitypackage: Path,
+    output_dir: Path,
+    package_name: str,
+    display_name: str,
+    git_init: bool = False,
+    use_lfs: bool = False,
 ) -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -123,6 +173,9 @@ def convert(
     write_package_json(pkg_dir, package_name, display_name)
     write_asmdef(runtime_dir, display_name.replace(" ", ""))
 
+    if git_init:
+        init_git_repo(pkg_dir, display_name, use_lfs=use_lfs)
+
     log.info("Done. Package written to %s", pkg_dir)
 
 
@@ -134,6 +187,17 @@ def main():
     p.add_argument("output_dir", type=Path, help="Destination directory")
     p.add_argument("package_name", help="UPM name, e.g. com.myco.asset")
     p.add_argument("display_name", help="Human-readable display name")
+    p.add_argument(
+        "--git-init",
+        "-g",
+        action="store_true",
+        help="Initialise a git repository in the generated package and commit the result",
+    )
+    p.add_argument(
+        "--lfs",
+        action="store_true",
+        help="After --git-init, copy .gitattributes and run 'git lfs install --local'",
+    )
 
     verbosity = p.add_mutually_exclusive_group()
     verbosity.add_argument(
@@ -155,7 +219,14 @@ def main():
 
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 
-    convert(args.unitypackage, args.output_dir, args.package_name, args.display_name)
+    convert(
+        args.unitypackage,
+        args.output_dir,
+        args.package_name,
+        args.display_name,
+        git_init=args.git_init,
+        use_lfs=args.lfs,
+    )
 
 
 if __name__ == "__main__":

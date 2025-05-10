@@ -1,0 +1,62 @@
+# ========================
+# Unity-specific LFS rules
+# ========================
+
+# Textures
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.tga filter=lfs diff=lfs merge=lfs -text
+*.tif filter=lfs diff=lfs merge=lfs -text
+*.exr filter=lfs diff=lfs merge=lfs -text
+*.hdr filter=lfs diff=lfs merge=lfs -text
+
+# 3D Models and geometry
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+
+# Audio
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+
+# Video
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+
+# Fonts
+*.ttf filter=lfs diff=lfs merge=lfs -text
+*.otf filter=lfs diff=lfs merge=lfs -text
+
+# Miscellaneous binaries
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+
+# ========================
+# Unity-specific TEXT rules
+# ========================
+
+# Let Git handle merging/diffing of these files (normal text)
+*.cs text
+*.shader text
+*.cginc text
+*.compute text
+*.txt text
+*.json text
+*.xml text
+*.asmdef text
+*.unity text
+*.prefab text
+*.mat text
+*.meta text
+*.asset text
+*.controller text
+*.overrideController text
+*.anim text
+*.physicMaterial text
+
+# ========================
+# Git configuration
+# ========================
+.gitattributes text

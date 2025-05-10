@@ -32,6 +32,9 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"upmify.templates" = ["*"]
+
 [tool.ruff]
 lint.extend-select = [
   "I",     # isort: Import sorting rules (ensures consistent ordering of imports)
