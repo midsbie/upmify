@@ -154,10 +154,22 @@ def convert(
     display_name: str,
     git_init: bool = False,
     use_lfs: bool = False,
+    force: bool = False,
 ) -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     pkg_dir = output_dir / package_name
+
+    if pkg_dir.exists():
+        if not force:
+            log.error(
+                "Package directory already exists: %s (use --force to overwrite)",
+                pkg_dir,
+            )
+            raise SystemExit(1)
+        log.info("Overwriting existing package directory: %s", pkg_dir)
+        shutil.rmtree(pkg_dir)
+
     runtime_dir = pkg_dir / "Runtime"
     runtime_dir.mkdir(parents=True, exist_ok=True)
 
@@ -199,6 +211,13 @@ def main():
         help="After --git-init, copy .gitattributes and run 'git lfs install --local'",
     )
 
+    p.add_argument(
+        "--force",
+        "-f",
+        action="store_true",
+        help="Delete the output package directory if it already exists",
+    )
+
     verbosity = p.add_mutually_exclusive_group()
     verbosity.add_argument(
         "--verbose", "-v", action="store_true", help="Enable detailed logging"
@@ -226,6 +245,7 @@ def main():
         args.display_name,
         git_init=args.git_init,
         use_lfs=args.lfs,
+        force=args.force,
     )
 
 
