@@ -28,7 +28,7 @@ cd upmify
 ### Basic CLI Usage
 
 ```bash
-python upmify.py \
+python -m upmify.cmd \
   /path/to/MyAsset.unitypackage \
   /path/to/output-dir \
   com.author.assetname \
@@ -44,7 +44,7 @@ python upmify.py \
 ## Example Use
 
 ```bash
-python upmify.py \
+python -m upmify.cmd \
   "$HOME/.local/share/unity3d/Asset Store-5.x/Some Publisher/Tools/My Cool Asset.unitypackage" \
   ./WrappedPackages \
   com.author.coolasset \

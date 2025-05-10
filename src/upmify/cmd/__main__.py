@@ -3,7 +3,7 @@
 Convert a .unitypackage to a UPM-style package.
 
 Usage:
-    python unitypackage_to_upm.py \
+    python -m upmify.cmd \
         MyAsset.unitypackage \
         ./out \
         com.mycompany.myasset \
