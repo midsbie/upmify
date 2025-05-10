@@ -38,8 +38,10 @@ def validate_assembly_name(name: str) -> str:
 
 def main():
     p = argparse.ArgumentParser(
-        description="Wrap a .unitypackage as a Unity UPM package"
+        description="Wrap a .unitypackage as a Unity UPM package",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+
     p.add_argument("unitypackage", type=Path, help="Path to the .unitypackage")
     p.add_argument(
         "--output-dir", "-o", required=True, type=Path, help="Destination directory"
@@ -75,12 +77,12 @@ def main():
     p.add_argument(
         "--package-version",
         default="1.0.0",
-        help="Version of the package (default: 1.0.0)",
+        help="Version of the package",
     )
     p.add_argument(
         "--unity-version",
-        default="2021.3",
-        help="Minimum required Unity version (default: 2021.3)",
+        default="6000.0",
+        help="Minimum required Unity version",
     )
 
     p.add_argument(
